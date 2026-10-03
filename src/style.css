@@ -1,0 +1,45 @@
+:root {
+  --bg: #f0f2f5;
+  --card: #fff;
+  --border: #d9d9d9;
+  --primary: #1677ff;
+  --danger: #d32f2f;
+  --ok: #2e7d32;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: system-ui, "Microsoft YaHei", sans-serif;
+  margin: 0;
+  background: var(--bg);
+  color: #333;
+}
+button {
+  padding: 6px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+}
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+button.danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+select, input[type="number"], input[type="text"] {
+  padding: 4px 8px;
+  font-size: 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.card {
+  background: var(--card);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.panel-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.err { color: var(--danger); }
+.ok { color: var(--ok); }

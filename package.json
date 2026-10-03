@@ -1,0 +1,20 @@
+{
+  "name": "bluetag-designer",
+  "private": true,
+  "version": "1.0.0",
+  "description": "B037 电子价签设计器 — Fabric.js 画布绘制 + 纯三色 PNG 导出 + 写卡",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "fabric": "^6.7.1",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.3.5"
+  }
+}
