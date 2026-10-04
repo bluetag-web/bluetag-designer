@@ -1,0 +1,74 @@
+# 持续集成 + GitHub Pages 自动部署
+# - push / PR 到 main: Node 多版本矩阵跑测试与构建
+# - push 到 main: 额外构建并部署到 GitHub Pages (需在仓库 Settings → Pages 中把 Source 设为 "GitHub Actions")
+name: CI & Pages Deploy
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+# 允许 Pages 部署使用 GITHUB_TOKEN
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一分支只保留最新一次部署，取消过期的进行中任务
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------- 测试矩阵 ----------
+  test:
+    name: Test & Build (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20.x, 22.x, 24.x]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Build
+        run: npm run build
+
+  # ---------- 部署到 GitHub Pages ----------
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      # 项目页部署在 /bluetag-designer/ 子路径下，需要覆盖 vite 的 base
+      - name: Build (Pages base path)
+        run: npm run build -- --base=/${{ github.event.repository.name }}/
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
