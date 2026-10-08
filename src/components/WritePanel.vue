@@ -1,6 +1,9 @@
 <script setup>
-import { ref, computed } from "vue";
-import { getStatus, writeTag, getApiBase, setApiBase } from "../lib/api.js";
+import { ref, computed, watch } from "vue";
+import { getStatus, writeTag, validateTag, getApiBase, setApiBase } from "../lib/api.js";
+
+// 验证按钮仅在开发模式 (npm run dev) 显示; npm run build 产物不含此按钮
+const isDev = import.meta.env.DEV;
 
 const props = defineProps({
   blob: { type: Object, default: null }, // 导出的 PNG Blob
@@ -92,6 +95,30 @@ function saveBase() {
 }
 
 const canWrite = computed(() => !!props.blob && !running.value && readerOk.value === true);
+
+// ---- 服务端预检验证 (仅开发模式) ----
+const validating = ref(false);
+const validateMsg = ref("");
+const validateOk = ref(false);
+
+// 重新导出后, 上一次的验证结果已过期, 清除
+watch(() => props.blob, () => { validateMsg.value = ""; });
+
+async function doValidate() {
+  if (!props.blob || validating.value) return;
+  validating.value = true;
+  validateMsg.value = "";
+  try {
+    const r = await validateTag(props.blob);
+    validateOk.value = true;
+    validateMsg.value = `服务端校验通过: 白 ${r.white} / 黑 ${r.black} / 红 ${r.red}`;
+  } catch (e) {
+    validateOk.value = false;
+    validateMsg.value = e.message;
+  } finally {
+    validating.value = false;
+  }
+}
 </script>
 
 <style scoped>
@@ -156,12 +183,19 @@ const canWrite = computed(() => !!props.blob && !running.value && readerOk.value
 </style>
 
 <template>
-  <div class="card">
+  <div class="card" style="margin-top: 14px;">
     <div class="panel-title">写卡 (全程约 20 秒, 勿移开标签)</div>
     <div class="row">
       <input type="text" v-model="base" @change="saveBase" title="写卡服务地址">
       
     </div>
+    <div v-if="isDev" class="row">
+      <button class="wide" :disabled="!blob || validating || running" @click="doValidate">
+        {{ validating ? "验证中…" : "验证 (服务端预检, 不写卡)" }}
+      </button>
+    </div>
+    <div v-if="isDev && validateMsg" style="font-size: 13px; margin-top: 0; margin-bottom: 8px; white-space: pre-wrap"
+      :class="validateOk ? 'ok' : 'err'">{{ validateMsg }}</div>
     <div class="row">
       <button @click="checkStatus" :disabled="running" class="shrink">检查读卡器</button>
       <button class="danger wide" :disabled="!canWrite" @click="startWrite">开始写入</button>

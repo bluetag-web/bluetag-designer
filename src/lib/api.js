@@ -17,6 +17,21 @@ export async function getStatus() {
   return resp.json();
 }
 
+// POST /api/validate — 仅校验图片 (不写卡, 不占写卡锁)
+// 返回 {ok, white, black, red, bwLen, rdLen}; 400 时抛出服务端纯文本错误
+export async function validateTag(blob) {
+  const fd = new FormData();
+  fd.append("image", blob, "design.png");
+  let resp;
+  try {
+    resp = await fetch(`${getApiBase()}/api/validate`, { method: "POST", body: fd });
+  } catch (e) {
+    throw new Error(`无法连接写卡服务 ${getApiBase()} (${e.message})`);
+  }
+  if (!resp.ok) throw new Error(await resp.text()); // 校验失败 (尺寸/非三色像素)
+  return resp.json();
+}
+
 // POST /api/write — 写卡, 流式解析 NDJSON 事件
 // onEvent(type, payload): progress(phase,done,total) / log(msg) / done(seconds)
 export async function writeTag(blob, handlers) {
