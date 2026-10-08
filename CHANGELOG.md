@@ -4,7 +4,7 @@
 
 ## [Unreleased]
 
-## [1.1.0] - 2026-10-08
+## [1.2.0] - 2026-10-08
 
 ### 新增
 - **服务端预检验证按钮**(仅开发模式):写卡面板新增"验证"按钮,调用 `POST /api/validate` 对当前导出的 PNG 做服务端同规则预检(240×416 纯三色,不写卡、不占写卡锁);通过 `import.meta.env.DEV` 控制,`npm run build` 产物中不包含该按钮;按钮独立成行,仅需已生成导出 Blob 即可点击,不依赖读卡器状态
@@ -24,5 +24,5 @@
 - 属性面板文字/图形/线条三模式切换(`isTextMode` / `isLineMode`);文字模式只应用 fill/fontSize,忽略描边线宽
 - `emitSel` 对多选组只报 `{type, isMulti}`(避免多选组无意义的具体属性)
 
-[Unreleased]: https://github.com/bluetag-web/bluetag-designer/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/bluetag-web/bluetag-designer/compare/v1.0.0...v1.1.0
+[Unreleased]: https://github.com/bluetag-web/bluetag-designer/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/bluetag-web/bluetag-designer/compare/v1.0.0...v1.2.0

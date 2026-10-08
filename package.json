@@ -1,7 +1,7 @@
 {
   "name": "bluetag-designer",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "B037 电子价签设计器 — Fabric.js 画布绘制 + 纯三色 PNG 导出 + 写卡",
   "type": "module",
   "scripts": {
